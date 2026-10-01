@@ -1,0 +1,1229 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Красивая Ты</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Karla:wght@400;500;600;700&display=swap');
+
+:root{
+  --bg:#FAF7F3; --surface:#FFFFFF; --surface-2:#F1E9E4;
+  --ink:#2A2420; --ink-soft:#79695F;
+  --accent:#A8536B; --accent-ink:#FFFFFF; --accent-soft:#F5E1E6;
+  --accent-deep:#743A4D; --accent-deep-soft:#EBD9DE;
+  --sage:#5F7D5C; --sage-soft:#E3ECDF;
+  --amber:#A97A2C; --amber-soft:#F3E4C9;
+  --border:#E7DDD3;
+  --shadow:0 1px 2px rgba(42,36,32,.06),0 6px 20px rgba(42,36,32,.08);
+  --font-display:'Fraunces',Georgia,serif;
+  --font-body:'Karla',system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1C1815; --surface:#252019; --surface-2:#2E2822;
+    --ink:#F1E9E1; --ink-soft:#B4A79A;
+    --accent:#E08CA2; --accent-ink:#241016; --accent-soft:#3B2530;
+    --accent-deep:#F2A9BC; --accent-deep-soft:#33222A;
+    --sage:#93B58C; --sage-soft:#28321F;
+    --amber:#D8A85B; --amber-soft:#3A2E18;
+    --border:#3B342C;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1C1815; --surface:#252019; --surface-2:#2E2822;
+  --ink:#F1E9E1; --ink-soft:#B4A79A;
+  --accent:#E08CA2; --accent-ink:#241016; --accent-soft:#3B2530;
+  --accent-deep:#F2A9BC; --accent-deep-soft:#33222A;
+  --sage:#93B58C; --sage-soft:#28321F;
+  --amber:#D8A85B; --amber-soft:#3A2E18;
+  --border:#3B342C;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box;}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--font-body);
+  padding:0 16px; padding-block:20px 96px; max-width:520px; margin:0 auto;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:var(--font-display); font-weight:600; margin:0; text-wrap:balance;}
+p{margin:0;}
+button{font-family:inherit; cursor:pointer;}
+.hidden{display:none!important;}
+
+/* header */
+.topbar{display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding-top:env(safe-area-inset-top,0px); margin-bottom:18px;}
+.topbar .greet{font-size:22px;}
+.topbar .date{font-size:13px; color:var(--ink-soft);}
+.gear{background:none; border:none; color:var(--ink-soft); font-size:18px; padding:6px; border-radius:8px;}
+.gear:hover{background:var(--surface-2);}
+
+/* cards */
+.card{background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:20px; box-shadow:var(--shadow); margin-bottom:14px;}
+.today-item-done{opacity:.55;}
+.hw-check-row{display:flex; gap:8px; flex-wrap:wrap; padding:0 0 12px 38px; margin-top:-4px;}
+.hw-check{width:24px; height:24px; border-radius:50%; border:2px solid var(--border); background:transparent; color:var(--accent-ink); font-size:13px; font-weight:700; line-height:1; display:flex; align-items:center; justify-content:center; padding:0; flex:none;}
+.hw-check.on{background:var(--accent); border-color:var(--accent);}
+.card-flat{background:var(--surface-2); border-radius:14px; padding:14px;}
+
+/* today */
+.today-eyebrow{font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); font-weight:700; margin-bottom:6px;}
+.today-title{font-size:24px; margin-bottom:10px;}
+.today-meta{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;}
+.chip{font-size:12px; padding:4px 10px; border-radius:999px; background:var(--surface-2); color:var(--ink-soft); font-weight:600;}
+.chip.zone{background:var(--accent-deep-soft); color:var(--accent-deep);}
+.chip.accent{background:var(--accent-soft); color:var(--accent);}
+.btn{border:none; border-radius:12px; padding:13px 18px; font-weight:700; font-size:15px; width:100%; text-align:center;}
+.btn-primary{background:var(--accent); color:var(--accent-ink);}
+.btn-secondary{background:var(--surface-2); color:var(--ink);}
+.btn-ghost{background:transparent; color:var(--ink-soft); border:1px solid var(--border);}
+.btn-row{display:flex; gap:10px; margin-top:10px;}
+.btn-row .btn{width:auto; flex:1;}
+a.btn{display:block; text-decoration:none; box-sizing:border-box;}
+
+.empty-state{text-align:center; padding:28px 10px;}
+.empty-state p{color:var(--ink-soft); font-size:14px; margin-top:6px;}
+
+/* tabs content */
+.section-title{font-size:13px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); font-weight:700; margin:22px 0 10px;}
+.section-title:first-child{margin-top:0;}
+
+/* catalog */
+.filter-row{display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-bottom:14px;}
+.filter-chip{flex:none; font-size:13px; padding:7px 14px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:var(--ink-soft); font-weight:600;}
+.filter-chip.active{background:var(--ink); color:var(--bg); border-color:var(--ink);}
+.lesson-list{display:flex; flex-direction:column; gap:10px;}
+.lesson-row{display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:12px 14px;}
+.lesson-dot{width:10px; height:10px; border-radius:50%; flex:none; background:var(--accent-deep);}
+.lesson-info{flex:1; min-width:0;}
+.lesson-info .t{display:block; font-weight:600; font-size:14.5px; white-space:normal; overflow-wrap:break-word;}
+.lesson-info .m{font-size:12.5px; color:var(--ink-soft); margin-top:2px;}
+.lesson-actions{display:flex; gap:6px; flex:none;}
+.icon-btn{background:var(--surface-2); border:none; border-radius:9px; width:34px; height:34px; font-size:15px; color:var(--ink-soft);}
+.done-check{color:var(--accent-deep); font-weight:700;}
+
+/* week */
+.plan-item{display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--border);}
+.plan-item:last-child{border-bottom:none;}
+.plan-num{width:26px; height:26px; border-radius:50%; background:var(--surface-2); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--ink-soft); flex:none;}
+.plan-item.done .plan-num{background:var(--accent-deep); color:#fff;}
+.plan-item.unmatched .plan-num{background:var(--amber-soft); color:var(--amber);}
+.plan-text{flex:1; min-width:0;}
+.plan-text .t{font-size:14px; font-weight:600;}
+.plan-text .r{font-size:12px; color:var(--ink-soft); margin-top:1px;}
+.day-header{font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--accent); font-weight:700; margin:16px 0 4px;}
+.day-header:first-child{margin-top:0;}
+.day-check{color:var(--sage); font-weight:700;}
+.week-block{margin-bottom:14px;}
+.week-block summary{list-style:none; cursor:pointer; font-size:13px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); font-weight:700; padding:2px 0; display:flex; align-items:center;}
+.week-block summary::-webkit-details-marker{display:none;}
+.week-block summary::before{content:'▸'; display:inline-block; margin-right:8px; font-size:11px; color:var(--ink-soft); transition:transform .15s ease;}
+.week-block[open] summary::before{transform:rotate(90deg);}
+select.match-select{margin-top:6px; font-size:12.5px; padding:5px 8px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--ink); max-width:100%;}
+
+/* progress */
+.ring-wrap{display:flex; align-items:center; gap:18px;}
+.ring-num{font-family:var(--font-display); font-size:28px;}
+.stat-row{display:flex; gap:10px; margin-top:14px;}
+.stat-box{flex:1; background:var(--surface-2); border-radius:12px; padding:12px; text-align:center;}
+.stat-box .n{font-family:var(--font-display); font-size:22px; font-variant-numeric:tabular-nums;}
+.stat-box .l{font-size:11.5px; color:var(--ink-soft); margin-top:2px;}
+.zone-bar-row{display:flex; align-items:center; gap:10px; margin-bottom:9px;}
+.zone-bar-label{width:96px; flex:none; font-size:12.5px; color:var(--ink-soft);}
+.zone-bar-track{flex:1; height:8px; background:var(--surface-2); border-radius:5px; overflow:hidden;}
+.zone-bar-fill{height:100%; background:var(--sage); border-radius:5px;}
+.zone-bar-n{width:20px; flex:none; text-align:right; font-size:12px; color:var(--ink-soft); font-variant-numeric:tabular-nums;}
+
+/* bottom nav */
+.nav{position:fixed; left:0; right:0; bottom:0; background:var(--surface); border-top:1px solid var(--border); padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px)); display:flex; max-width:520px; margin:0 auto;}
+.nav-btn{flex:1; background:none; border:none; display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 2px; color:var(--ink-soft); font-size:10.5px; font-weight:700; letter-spacing:.02em;}
+.nav-btn .ic{width:20px; height:20px;}
+.nav-btn.active{color:var(--accent);}
+
+/* modal */
+.overlay{position:fixed; inset:0; background:rgba(20,16,14,.5); display:flex; align-items:flex-end; z-index:50;}
+.sheet{background:var(--bg); width:100%; max-width:520px; margin:0 auto; border-radius:20px 20px 0 0; padding:20px; padding-bottom:calc(20px + env(safe-area-inset-bottom,0px)); max-height:88vh; overflow-y:auto;}
+.sheet-title{font-size:19px; margin-bottom:14px;}
+.field{margin-bottom:14px;}
+.field label{display:block; font-size:12.5px; font-weight:700; color:var(--ink-soft); margin-bottom:6px;}
+.field input[type=text],.field input[type=url],.field input[type=number],.field textarea,.field select{
+  width:100%; padding:11px 12px; border:1px solid var(--border); border-radius:10px; background:var(--surface); color:var(--ink); font-family:inherit; font-size:14.5px;
+}
+.field textarea{min-height:90px; resize:vertical;}
+.chipset{display:flex; flex-wrap:wrap; gap:8px;}
+.chip-toggle{padding:8px 13px; border-radius:999px; border:1px solid var(--border); background:var(--surface); font-size:13px; color:var(--ink); font-weight:600;}
+.chip-toggle.on{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+.close-x{position:absolute; top:16px; right:16px; background:var(--surface-2); border:none; width:30px; height:30px; border-radius:50%; color:var(--ink-soft); font-size:15px;}
+.sheet{position:relative;}
+.copy-box{width:100%; min-height:120px; border:1px solid var(--border); border-radius:10px; padding:10px; font-size:13px; background:var(--surface-2); color:var(--ink); font-family:inherit;}
+.note{font-size:12px; color:var(--ink-soft); margin-top:8px; line-height:1.5;}
+.example-tag{font-size:10.5px; background:var(--amber-soft); color:var(--amber); padding:2px 7px; border-radius:6px; font-weight:700; margin-left:6px;}
+</style>
+</head>
+<body>
+
+
+<div class="topbar">
+  <div>
+    <div class="greet" id="greetText">Привет</div>
+    <div class="date" id="dateText"></div>
+  </div>
+  <button class="gear" id="settingsBtn" aria-label="Настройки">⚙</button>
+</div>
+
+<div id="view-today"></div>
+<div id="view-progress" class="hidden"></div>
+<div id="view-resources" class="hidden"></div>
+<div id="view-week" class="hidden"></div>
+<div id="view-catalog" class="hidden"></div>
+
+<nav class="nav">
+  <button class="nav-btn active" data-tab="today"><span class="ic">●</span>Сегодня</button>
+  <button class="nav-btn" data-tab="progress"><span class="ic">◔</span>Прогресс</button>
+  <button class="nav-btn" data-tab="resources"><span class="ic">✚</span>Эфиры</button>
+  <button class="nav-btn" data-tab="week"><span class="ic">▤</span>Неделя</button>
+  <button class="nav-btn" data-tab="catalog"><span class="ic">▦</span>Каталог</button>
+</nav>
+
+<div id="modalRoot"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = "vera_app_state_v1";
+  var ZONES = ["Пресс","Тазовое дно","Спина","Ноги","Всё тело","Растяжка","Другое"];
+  var RES_CATS = ["Тренер","Психолог","Нутрициолог","Массажист"];
+  var FEEL_OPTS = ["Тянет низ живота","Боль в пояснице","Боль в спине","Дискомфорт в тазовом дне","Головокружение","Всё отлично"];
+  var CHANGE_OPTS = ["Короче","Длиннее","Без инвентаря","Нужен разбор техники"];
+
+  function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
+  function todayStr(){ var d=new Date(); return d.toISOString().slice(0,10); }
+  function fmtDate(){
+    var d = new Date();
+    return d.toLocaleDateString('ru-RU', {weekday:'long', day:'numeric', month:'long'});
+  }
+
+  var DURATIONS = {
+    "4":"4 мин 30 сек", "5":"1 мин 50 сек", "7":"12 мин 53 сек", "8":"10 мин",
+    "9":"14 мин 33 сек", "10":"11 мин 11 сек", "27":"15 сек", "31":"6 мин 54 сек",
+    "32":"13 мин 10 сек", "33":"11 мин 56 сек", "34":"15 мин 57 сек", "50":"6 мин 25 сек",
+    "51":"11 мин 10 сек", "52":"13 мин", "53":"12 мин 45 сек", "54":"16 мин",
+    "69":"8 мин 15 сек", "70":"14 мин 51 сек", "82":"19 мин 32 сек", "98":"26 мин",
+    "99":"22 мин 40 сек", "100":"41 мин 23 сек", "101":"38 мин 39 сек", "106":"6 мин 51 сек",
+    "107":"6 мин 15 сек", "108":"5 мин 15 сек", "109":"6 мин 28 сек", "117":"18 мин 37 сек",
+    "126":"42 мин 20 сек", "127":"34 мин 33 сек", "128":"32 мин", "129":"28 мин",
+    "146":"19 мин 13 сек", "147":"28 мин 24 сек"
+  };
+  function applyDurations(catalog){
+    (catalog||[]).forEach(function(c){
+      if(DURATIONS[c.code]) c.durationLabel = DURATIONS[c.code];
+    });
+  }
+  function roundedDurationMinutes(c){
+    if(c.durationLabel){
+      var mMatch = c.durationLabel.match(/(\d+)\s*мин/);
+      var sMatch = c.durationLabel.match(/(\d+)\s*сек/);
+      var mins = mMatch ? parseInt(mMatch[1],10) : 0;
+      var secs = sMatch ? parseInt(sMatch[1],10) : 0;
+      if(secs>0) mins += 1;
+      if(mins<=0 && secs>0) mins = 1;
+      return mins;
+    }
+    if(c.duration) return c.duration;
+    return 0;
+  }
+  function seedState(){
+    function L(code, title, zone, link){
+      return {id:uid(), code:code, title:title, zone:zone, duration:0, tags:"", link:link, example:false};
+    }
+    var base = "https://t.me/c/1944049848/";
+    var catalog = [
+      L("4","Приветствие и теория","Другое", base+"4"),
+      L("5","Инвентарь","Другое", base+"5"),
+      L("7","Расслабление спины, грудного отдела","Спина", base+"7"),
+      L("8","Ягодицы 3д","Ноги", base+"8"),
+      L("9","Дыхание и красивые бёдра","Ноги", base+"9"),
+      L("10","Человек рождён ходить","Ноги", base+"10"),
+      L("27","Лайфхак для осанки","Ноги", base+"27"),
+      L("31","Функционал 3д","Всё тело", base+"31"),
+      L("32","Расслабление поясницы","Спина", base+"32"),
+      L("33","Красивый живот","Пресс", base+"33"),
+      L("34","Женское здоровье","Тазовое дно", base+"34"),
+      L("50","Секретные техники","Ноги", base+"50"),
+      L("51","Компьютерная шея","Спина", base+"51"),
+      L("52","От отёков, 1 уровень","Ноги", base+"52"),
+      L("146","От отёков, 2 уровень","Ноги", base+"146"),
+      L("53","Ягодичная тренировка","Ноги", base+"53"),
+      L("54","Ушки на бёдрах","Ноги", base+"54"),
+      L("69","Дыхание на каждый день","Растяжка", base+"69"),
+      L("70","Круговая 3д","Всё тело", base+"70"),
+      L("82","МФР грудного отдела","Спина", base+"82"),
+      L("98","МФР головы и шеи","Спина", base+"98"),
+      L("99","Спина 3д","Спина", base+"99"),
+      L("100","Тренировка на колени","Ноги", base+"100"),
+      L("101","Косточка на стопе","Ноги", base+"101"),
+      L("106","Тренировка шва","Тазовое дно", base+"106"),
+      L("117","Разгон лимфы и плоский живот","Пресс", base+"117"),
+      L("107","Зарядка 1, разгон лимфы","Всё тело", base+"107"),
+      L("108","Зарядка 2, суставная гимнастика","Всё тело", base+"108"),
+      L("109","Зарядка 3, включаем ягодицы","Ноги", base+"109"),
+      L("126","Тренировка мышц тазового дна, 1 уровень","Тазовое дно", base+"126"),
+      L("127","Тренировка мышц тазового дна, 2 уровень","Тазовое дно", base+"127"),
+      L("128","Функционал без оборудования","Всё тело", base+"128"),
+      L("129","Тренировка на всё тело","Всё тело", base+"129"),
+      L("147","Лёгкость в теле","Растяжка", base+"147")
+    ];
+    applyDurations(catalog);
+    return {
+      catalog: catalog,
+      plan: { label: "", rawText: "", items: [] },
+      feedbackLog: [],
+      resources: [
+        {id:uid(), title:"Вводный перед стартом курса", category:"Тренер", note:"разбор основных вопросов, Вера Румянцева", link:"https://t.me/c/1944049848/86", durationLabel:"47 мин"},
+        {id:uid(), title:"Психологическое состояние и осанка", category:"Психолог", note:"Вера Румянцева", link:"https://t.me/c/1944049848/43", durationLabel:"60 мин"},
+        {id:uid(), title:"Про дыхание и шаг", category:"Тренер", note:"Вера Румянцева", link:"https://t.me/c/1944049848/59", durationLabel:"30 мин"},
+        {id:uid(), title:"Как понять свой тип дыхания", category:"Тренер", note:"Вера Румянцева", link:"https://t.me/c/1944049848/66", durationLabel:"18 мин"},
+        {id:uid(), title:"Тренировка лица", category:"Массажист", note:"фейс-фитнес и массаж, Екатерина", link:"https://t.me/c/1944049848/81", durationLabel:"1 ч 10 мин"},
+        {id:uid(), title:"Питание для улучшения осанки", category:"Нутрициолог", note:"наставник по питанию и молодости Яна Мочкаева", link:"https://t.me/c/1944049848/96", durationLabel:"51 мин"}
+      ]
+    };
+  }
+
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        var s = JSON.parse(raw);
+        if(!s.resources) s.resources = [];
+        if(!s.weeks && s.plan && s.plan.items && s.plan.items.length){ s.weeks = [s.plan]; }
+        return s;
+      }
+    }catch(e){}
+    return seedState();
+  }
+  function saveState(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+
+  var state = loadState();
+  var activeTab = "today";
+  var catalogFilter = null;
+
+  function catalogById(id){
+    for(var i=0;i<state.catalog.length;i++){ if(state.catalog[i].id===id) return state.catalog[i]; }
+    return null;
+  }
+  function catalogByCode(code){
+    for(var i=0;i<state.catalog.length;i++){ if(state.catalog[i].code===code) return state.catalog[i]; }
+    return null;
+  }
+
+  function dayItem(code, label){
+    var c = catalogByCode(code);
+    return {id:uid(), catalogId:c?c.id:null, rawLine:label, done:false, completedAt:null, feedback:null, type:'lesson'};
+  }
+  function restItem(label){
+    return {id:uid(), catalogId:null, rawLine:label, done:false, completedAt:null, feedback:null, type:'rest'};
+  }
+  function noteItem(label){
+    return {id:uid(), catalogId:null, rawLine:label, done:false, completedAt:null, feedback:null, type:'note'};
+  }
+  // Домашние задания теперь показываются отдельным постоянным блоком на
+  // вкладке «Сегодня», а не пунктами внутри дней недели — поэтому эта
+  // функция просто убирает такие пункты (type:'homework') из недели, если
+  // они там остались от старой версии приложения.
+  function ensureHomework(week){
+    var items = week.items || [];
+    if(!items.length) return;
+    week.items = items.filter(function(it){ return it.type!=='homework'; });
+  }
+  function buildWeek1(){
+    var l147 = catalogByCode("147"); if(l147) l147.duration = 30;
+    return {
+      id: uid(),
+      label: "1 неделя",
+      rawText: "1 неделя:\nдень 1 - «расслабление спины»\nдень 2 - «дыхание и красивые бедра»\nдень 3 - выходной\nдень 4 - «женское здоровье»\nдень 5 - «компьютерная шея» и «секретные техники»\nдень 6 - расслабление поясницы и «от отеков» 1 уровень\nдень 7 - «Дыхание на каждый день» и «человек рожден ходить» и тренировка шага на улице минимум 15 минут",
+      items: [
+        dayItem("7", "День 1 — Расслабление спины, грудного отдела"),
+        dayItem("9", "День 2 — Дыхание и красивые бёдра"),
+        restItem("День 3 — выходной"),
+        dayItem("34", "День 4 — Женское здоровье"),
+        dayItem("51", "День 5 — Компьютерная шея"),
+        dayItem("50", "День 5 — Секретные техники"),
+        dayItem("32", "День 6 — Расслабление поясницы"),
+        dayItem("52", "День 6 — От отёков, 1 уровень"),
+        dayItem("69", "День 7 — Дыхание на каждый день"),
+        dayItem("10", "День 7 — Человек рождён ходить"),
+        noteItem("День 7 — Тренировка шага на улице, минимум 15 минут (без сумок, без детей, не до магазина — именно техника шага с видео)")
+      ]
+    };
+  }
+  function buildWeek2(){
+    var l147 = catalogByCode("147"); if(l147) l147.duration = 30;
+    return {
+      id: uid(),
+      label: "2 неделя",
+      rawText: "Вторая неделя:\nдень 1 - «Человек рожден ходить» и тренировка шага на улице 15-20 минут, и вечером «От отеков 2 уровень»\nдень 2 - «Расслабление поясницы»\nдень 3 - Выходной\nдень 4 - «Дыхание на каждый день» и «Функционал 3Д»\nдень 5 - «Легкость в теле» (почти 30 мин, время заранее освободи)\nдень 6 - ходьба на улице 20-30 минут (комплекс на стопы «Человек рожден ходить» до тренировки обязательно!)\nдень 7 - «МФР грудного отдела»",
+      items: [
+        dayItem("10", "День 1 — Человек рождён ходить"),
+        noteItem("День 1 — Тренировка шага на улице, 15–20 минут"),
+        dayItem("146", "День 1 (вечер) — От отёков, 2 уровень"),
+        dayItem("32", "День 2 — Расслабление поясницы"),
+        restItem("День 3 — выходной"),
+        dayItem("69", "День 4 — Дыхание на каждый день"),
+        dayItem("31", "День 4 — Функционал 3д"),
+        dayItem("147", "День 5 — Лёгкость в теле (≈30 мин, освободи время заранее)"),
+        dayItem("10", "День 6 — Человек рождён ходить (комплекс на стопы, сделать до ходьбы!)"),
+        noteItem("День 6 — Ходьба на улице, 20–30 минут"),
+        dayItem("82", "День 7 — МФР грудного отдела")
+      ]
+    };
+  }
+  if(!state.weeks){
+    state.weeks = [buildWeek1(), buildWeek2()];
+    delete state.plan;
+    saveState();
+  } else {
+    var hasWeek1 = state.weeks.some(function(w){ return w && w.label === '1 неделя'; });
+    if(!hasWeek1){
+      state.weeks.unshift(buildWeek1());
+      saveState();
+    }
+  }
+  state.weeks.forEach(function(w){ ensureHomework(w); });
+  // Записи Веры Румянцевой в «Эфирах» переносим из категории «Другое» в «Тренер».
+  (state.resources||[]).forEach(function(r){
+    if(r.category==="Другое" && /Вера Румянцева/i.test(r.note||"")){ r.category = "Тренер"; }
+  });
+  // Метка «Другое» убрана из «Эфиров» — всё, что осталось без категории из
+  // текущего списка, уходит в «Тренер».
+  (state.resources||[]).forEach(function(r){
+    if(RES_CATS.indexOf(r.category)===-1){ r.category = "Тренер"; }
+  });
+  // «Секретные техники» — зона «Ноги», а не «Всё тело».
+  (function(){
+    var l50 = catalogByCode("50");
+    if(l50) l50.zone = "Ноги";
+  })();
+  // «Зарядка 3» переименована и получила зону «Ноги».
+  (function(){
+    var l109 = catalogByCode("109");
+    if(l109){ l109.title = "Зарядка 3, включаем ягодицы"; l109.zone = "Ноги"; }
+  })();
+  // «Человек рождён ходить» — зона «Ноги».
+  (function(){
+    var l10 = catalogByCode("10");
+    if(l10) l10.zone = "Ноги";
+  })();
+  // «Лайфхак для осанки» — зона «Ноги».
+  (function(){
+    var l27 = catalogByCode("27");
+    if(l27) l27.zone = "Ноги";
+  })();
+  applyDurations(state.catalog);
+  // Эфиры: приводим к текущему виду (название/описание/длительность) по ссылке,
+  // чтобы старые сохранённые записи с прежними названиями не оставались без обновлений.
+  (function(){
+    var RES_CANON = {
+      "https://t.me/c/1944049848/86": {title:"Вводный перед стартом курса", category:"Тренер", note:"разбор основных вопросов, Вера Румянцева", durationLabel:"47 мин"},
+      "https://t.me/c/1944049848/43": {title:"Психологическое состояние и осанка", category:"Психолог", note:"Вера Румянцева", durationLabel:"60 мин"},
+      "https://t.me/c/1944049848/59": {title:"Про дыхание и шаг", category:"Тренер", note:"Вера Румянцева", durationLabel:"30 мин"},
+      "https://t.me/c/1944049848/66": {title:"Как понять свой тип дыхания", category:"Тренер", note:"Вера Румянцева", durationLabel:"18 мин"},
+      "https://t.me/c/1944049848/81": {title:"Тренировка лица", category:"Массажист", note:"фейс-фитнес и массаж, Екатерина", durationLabel:"1 ч 10 мин"},
+      "https://t.me/c/1944049848/96": {title:"Питание для улучшения осанки", category:"Нутрициолог", note:"наставник по питанию и молодости Яна Мочкаева", durationLabel:"51 мин"}
+    };
+    (state.resources||[]).forEach(function(r){
+      var canon = RES_CANON[r.link];
+      if(canon){
+        r.title = canon.title;
+        r.category = canon.category;
+        r.note = canon.note;
+        r.durationLabel = canon.durationLabel;
+      }
+    });
+  })();
+  saveState();
+  function currentWeek(){
+    return state.weeks.length ? state.weeks[state.weeks.length-1] : null;
+  }
+
+  // ---------- parsing weekly plan text ----------
+  function parsePlanText(text){
+    var lines = text.split("\n").map(function(l){return l.trim();}).filter(Boolean);
+    return lines.map(function(line){
+      var matchId = null;
+      var numMatch = line.match(/(?:№\s*|#\s*|^)(\d{1,3})[\.\)]?/);
+      if(numMatch){
+        var num = numMatch[1];
+        var byCode = state.catalog.find(function(c){ return c.code === num; });
+        if(byCode) matchId = byCode.id;
+      }
+      if(!matchId){
+        var lower = line.toLowerCase().replace(/^\d+[\.\)]\s*/, "");
+        var best = null, bestLen = 0;
+        state.catalog.forEach(function(c){
+          var t = c.title.toLowerCase();
+          if((lower.indexOf(t) !== -1 || t.indexOf(lower) !== -1) && t.length > bestLen){
+            best = c; bestLen = t.length;
+          }
+        });
+        if(best) matchId = best.id;
+      }
+      return {id:uid(), catalogId:matchId, rawLine:line, done:false, completedAt:null, feedback:null};
+    });
+  }
+
+  // ---------- rendering ----------
+  function el(html){ var d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
+
+  function render(){
+    document.getElementById('greetText').textContent = greeting();
+    document.getElementById('dateText').textContent = capitalize(fmtDate());
+    ['today','progress','resources','week','catalog'].forEach(function(t){
+      document.getElementById('view-'+t).classList.toggle('hidden', t!==activeTab);
+    });
+    document.querySelectorAll('.nav-btn').forEach(function(b){
+      b.classList.toggle('active', b.dataset.tab===activeTab);
+    });
+    if(activeTab==='today') renderToday();
+    if(activeTab==='catalog') renderCatalog();
+    if(activeTab==='week') renderWeek();
+    if(activeTab==='resources') renderResources();
+    if(activeTab==='progress') renderProgress();
+  }
+
+  function greeting(){
+    return "Привет, дорогая 💗";
+  }
+  function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+  function renderVeraQuote(){
+    return el(
+      '<div class="card" style="background:var(--accent-soft); border:none;">'+
+        '<p style="font-size:14px; color:var(--accent-deep); font-weight:600; margin:0; line-height:1.5;">'+
+          'Придерживайся своего личного расписания, и твои цели будут достигнуты!<br>Благодаря тренировкам можно похудеть, улучшить осанку, здоровье и самочувствие.'+
+        '</p>'+
+      '</div>'
+    );
+  }
+  var HOMEWORK_REFERENCE = [
+    {code:"27", title:"Тренировка для стоп «Лайфхак для осанки»", freq:"Каждое утро", count:6},
+    {code:"50", title:"«Секретные техники» — антицеллюлитный массаж", freq:"2 раза в неделю", count:2},
+    {code:"10", title:"Тренировка шага по видео «Человек рождён ходить»", freq:"1–2 раза в неделю", count:2},
+    {code:"69", title:"«Дыхание на каждый день»", freq:"2 раза в неделю", count:2}
+  ];
+  function getHomeworkChecks(weekId, code, count){
+    if(!state.homeworkChecks) state.homeworkChecks = {};
+    if(!state.homeworkChecks[weekId]) state.homeworkChecks[weekId] = {};
+    var arr = state.homeworkChecks[weekId][code];
+    if(!arr) arr = [];
+    while(arr.length < count) arr.push(false);
+    arr.length = count;
+    state.homeworkChecks[weekId][code] = arr;
+    return arr;
+  }
+  function renderHomeworkCard(){
+    var wk = currentWeek();
+    var weekId = wk ? wk.id : '_no_week';
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.appendChild(el('<div class="section-title" style="margin-top:0;">Дополнительные занятия</div>'));
+    HOMEWORK_REFERENCE.forEach(function(hw, idx){
+      var lesson = catalogByCode(hw.code);
+      var checks = getHomeworkChecks(weekId, hw.code, hw.count);
+      var row = document.createElement('div');
+      row.className = 'plan-item';
+      row.style.borderBottom = 'none';
+      row.style.paddingBottom = '4px';
+      row.innerHTML =
+        '<div class="plan-num">'+(idx+1)+'</div>'+
+        '<div class="plan-text">'+
+          '<div class="t">'+escapeHtml(hw.title)+'</div>'+
+          '<div class="r">'+escapeHtml(hw.freq)+'</div>'+
+        '</div>';
+      if(lesson){
+        var a = document.createElement('a');
+        a.href = lesson.link; a.target = '_blank'; a.rel = 'noopener';
+        a.className = 'chip accent'; a.style.textDecoration = 'none'; a.style.flex = 'none';
+        a.textContent = 'Открыть';
+        row.appendChild(a);
+      }
+      card.appendChild(row);
+      var checkRow = document.createElement('div');
+      checkRow.className = 'hw-check-row';
+      if(idx < HOMEWORK_REFERENCE.length-1){
+        checkRow.style.borderBottom = '1px solid var(--border)';
+        checkRow.style.paddingBottom = '12px';
+        checkRow.style.marginBottom = '4px';
+      }
+      checks.forEach(function(done, i){
+        var dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'hw-check' + (done ? ' on' : '');
+        dot.setAttribute('aria-label', (i+1)+' из '+checks.length);
+        dot.textContent = done ? '✓' : '';
+        dot.onclick = function(){
+          checks[i] = !checks[i];
+          saveState();
+          render();
+        };
+        checkRow.appendChild(dot);
+      });
+      card.appendChild(checkRow);
+    });
+    return card;
+  }
+  function renderCriticalDaysNote(){
+    var breathLesson = catalogByCode("69");
+    var breathPhrase = breathLesson ?
+      '<a href="'+breathLesson.link+'" target="_blank" rel="noopener" style="color:var(--accent); font-weight:700; text-decoration:none;">«Дыхание на каждый день»</a>' :
+      '«Дыхание на каждый день»';
+    return el(
+      '<div class="card">'+
+        '<div class="section-title" style="margin-top:0;">Женские дни</div>'+
+        '<p style="font-size:13.5px; color:var(--ink); line-height:1.55; margin:0 0 8px;">Первый день пропускаем всегда, второй — при хорошем самочувствии можно сделать занятие '+breathPhrase+', с третьего дня — по расписанию.</p>'+
+        '<p style="font-size:13.5px; color:var(--ink); line-height:1.55; margin:0;">Если женские дни обильные, то пропускаете сколько понадобится, по самочувствию, и далее возвращаемся к расписанию.</p>'+
+      '</div>'
+    );
+  }
+
+  function isEvening(item){
+    return /\(вечер/i.test(item.rawLine||"");
+  }
+
+  function renderTodayItemCard(item){
+    var lesson = item.catalogId ? catalogById(item.catalogId) : null;
+    var card = document.createElement('div');
+    card.className = 'card' + (item.done ? ' today-item-done' : '');
+    var html = '';
+    if(item.type==='homework'){
+      html += '<span class="chip accent" style="margin-bottom:8px; display:inline-block;">Домашнее задание</span>';
+    }
+
+    if(item.type==='rest'){
+      html += '<div class="today-title">Милая, ты хорошо потрудилась, сегодня отдохни!</div>'+
+              '<div style="margin:4px 0 8px;">'+
+                '<svg width="26" height="26" viewBox="0 0 24 24" fill="var(--accent)" aria-hidden="true">'+
+                  '<path d="M12 21s-6.716-4.35-9.428-8.06C.94 10.31 1.2 6.9 3.64 5.02 5.86 3.3 8.9 3.8 10.6 6.02L12 7.86l1.4-1.84c1.7-2.22 4.74-2.72 6.96-1 2.44 1.88 2.7 5.29 1.07 7.92C18.716 16.65 12 21 12 21z"/>'+
+                '</svg>'+
+              '</div>'+
+              '<p style="font-size:13.5px;color:var(--ink-soft);margin:4px 0 0;">Можно ничего не делать — это часть плана.</p>';
+      card.innerHTML = html;
+      if(!item.done){
+        var restBtn = document.createElement('button');
+        restBtn.className = 'btn btn-primary';
+        restBtn.style.marginTop = '12px';
+        restBtn.textContent = 'Отметить и идти дальше';
+        restBtn.onclick = function(){ item.done = true; item.completedAt = todayStr(); saveState(); render(); };
+        card.appendChild(restBtn);
+      } else {
+        card.appendChild(el('<div style="font-size:13px;color:var(--sage);font-weight:700;margin-top:8px;">✓ Отмечено</div>'));
+      }
+    } else if(item.type==='note'){
+      html += '<div class="today-title">'+escapeHtml(stripDayPrefix(item.rawLine))+'</div>';
+      card.innerHTML = html;
+      if(!item.done){
+        var noteBtn = document.createElement('button');
+        noteBtn.className = 'btn btn-primary';
+        noteBtn.style.marginTop = '12px';
+        noteBtn.textContent = 'Сделала ✓';
+        noteBtn.onclick = function(){ openFeedbackModal(item, null); };
+        card.appendChild(noteBtn);
+      } else {
+        card.appendChild(el('<div style="font-size:13px;color:var(--sage);font-weight:700;margin-top:8px;">✓ Сделано</div>'));
+      }
+    } else {
+      if(lesson){
+        html += '<div class="today-title">'+escapeHtml(lesson.title)+'</div>';
+        html += '<div class="today-meta">'+
+                  (function(){ var m = roundedDurationMinutes(lesson); return m>0 ? '<span class="chip">'+m+' мин</span>' : ''; })()+
+                  (lesson.tags? '<span class="chip">'+escapeHtml(lesson.tags)+'</span>':'')+
+                  (isEvening(item)? '<span class="chip accent">Вечером</span>':'')+
+                '</div>';
+      } else {
+        html += '<div class="today-title">'+escapeHtml(stripDayPrefix(item.rawLine))+'</div>';
+        html += '<p style="font-size:13px;color:var(--ink-soft);margin-bottom:12px;">Не удалось сопоставить с каталогом — выберите занятие вручную на вкладке «Неделя».</p>';
+      }
+      card.innerHTML = html;
+      if(!item.done){
+        var row = document.createElement('div');
+        row.className = 'btn-row';
+        if(lesson){
+          var a = document.createElement('a');
+          a.className = 'btn btn-primary'; a.href = lesson.link; a.target = '_blank'; a.rel='noopener';
+          a.textContent = 'Открыть';
+          row.appendChild(a);
+        }
+        var doneBtn = document.createElement('button');
+        doneBtn.className = 'btn btn-primary';
+        doneBtn.textContent = 'Сделала ✓';
+        doneBtn.onclick = function(){ openFeedbackModal(item, lesson); };
+        row.appendChild(doneBtn);
+        card.appendChild(row);
+      } else {
+        card.appendChild(el('<div style="font-size:13px;color:var(--sage);font-weight:700;margin-top:8px;">✓ Сделано</div>'));
+      }
+    }
+    return card;
+  }
+
+  function renderToday(){
+    var root = document.getElementById('view-today');
+    root.innerHTML = "";
+    root.appendChild(renderVeraQuote());
+    var wk = currentWeek();
+    var items = wk ? (wk.items || []) : [];
+    if(items.length===0){
+      root.appendChild(el(
+        '<div class="card empty-state">'+
+          '<h3>Плана пока нет</h3>'+
+          '<p>Вставьте последовательность занятий от Веры на вкладке «Неделя», и здесь появится сегодняшнее занятие.</p>'+
+        '</div>'
+      ));
+      root.appendChild(renderHomeworkCard());
+      root.appendChild(renderCriticalDaysNote());
+      return;
+    }
+    var nextIdx = -1;
+    for(var i=0;i<items.length;i++){ if(!items[i].done){ nextIdx=i; break; } }
+
+    if(nextIdx===-1){
+      root.appendChild(el(
+        '<div class="card empty-state">'+
+          '<h3>План недели выполнен 🎉</h3>'+
+          '<p>Все занятия из последовательности Веры отмечены сделанными. Вставьте новый план, когда придёт следующий.</p>'+
+        '</div>'
+      ));
+      root.appendChild(renderHomeworkCard());
+      root.appendChild(renderCriticalDaysNote());
+      return;
+    }
+
+    var todayLabel = dayLabelOf(items[nextIdx]);
+    var todayIdxs = [];
+    for(var k=0;k<items.length;k++){ if(dayLabelOf(items[k])===todayLabel) todayIdxs.push(k); }
+    var doneCount = todayIdxs.filter(function(idx){ return items[idx].done; }).length;
+    var weekNumMatch = wk.label.match(/(\d+)/);
+    var weekLabelDisplay = weekNumMatch ? ('Неделя '+weekNumMatch[1]) : wk.label;
+
+    root.appendChild(el(
+      '<div class="today-eyebrow">Сегодня · '+escapeHtml(todayLabel)+' · '+escapeHtml(weekLabelDisplay)+' · '+doneCount+' из '+todayIdxs.length+'</div>'
+    ));
+    todayIdxs.forEach(function(idx){
+      root.appendChild(renderTodayItemCard(items[idx]));
+    });
+
+    root.appendChild(renderHomeworkCard());
+    root.appendChild(renderCriticalDaysNote());
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function renderCatalog(){
+    var root = document.getElementById('view-catalog');
+    root.innerHTML = "";
+    var filterRow = document.createElement('div');
+    filterRow.className = 'filter-row';
+    var allChip = el('<button class="filter-chip'+(catalogFilter===null?' active':'')+'">Все</button>');
+    allChip.onclick = function(){ catalogFilter=null; render(); };
+    filterRow.appendChild(allChip);
+    ZONES.forEach(function(z){
+      var chip = el('<button class="filter-chip'+(catalogFilter===z?' active':'')+'">'+escapeHtml(z)+'</button>');
+      chip.onclick = function(){ catalogFilter=z; render(); };
+      filterRow.appendChild(chip);
+    });
+    root.appendChild(filterRow);
+
+    var list = document.createElement('div');
+    list.className = 'lesson-list';
+    var items = state.catalog.filter(function(c){ return !catalogFilter || c.zone===catalogFilter; });
+    if(items.length===0){
+      list.appendChild(el('<div class="card empty-state"><p>Занятий в этой категории пока нет.</p></div>'));
+    }
+    items.forEach(function(c){
+      var row = document.createElement('div');
+      row.className = 'lesson-row';
+      row.innerHTML =
+        '<span class="lesson-dot"></span>'+
+        '<div class="lesson-info">'+
+          '<a href="'+c.link+'" target="_blank" rel="noopener" class="t" style="color:var(--accent); text-decoration:none;">'+escapeHtml(c.title)+'</a>'+
+          (function(){ var m = roundedDurationMinutes(c); return m>0 ? '<div class="m">'+m+' мин</div>' : ''; })()+
+        '</div>';
+      list.appendChild(row);
+    });
+    root.appendChild(list);
+
+    var addBtn = document.createElement('button');
+    addBtn.className = 'btn btn-ghost';
+    addBtn.style.marginTop = '14px';
+    addBtn.textContent = '+ Добавить занятие в каталог';
+    addBtn.onclick = function(){ openLessonForm(null); };
+    root.appendChild(addBtn);
+  }
+
+  var resourceFilter = null;
+
+  function renderResources(){
+    var root = document.getElementById('view-resources');
+    root.innerHTML = "";
+
+    root.appendChild(el('<p class="note" style="margin-bottom:14px;">Специалисты и материалы в помощь к тренировкам — психолог, нутрициолог, массажист и другое.</p>'));
+
+    var filterRow = document.createElement('div');
+    filterRow.className = 'filter-row';
+    var allChip = el('<button class="filter-chip'+(resourceFilter===null?' active':'')+'">Все</button>');
+    allChip.onclick = function(){ resourceFilter=null; render(); };
+    filterRow.appendChild(allChip);
+    RES_CATS.forEach(function(cat){
+      var chip = el('<button class="filter-chip'+(resourceFilter===cat?' active':'')+'">'+escapeHtml(cat)+'</button>');
+      chip.onclick = function(){ resourceFilter=cat; render(); };
+      filterRow.appendChild(chip);
+    });
+    root.appendChild(filterRow);
+
+    var list = document.createElement('div');
+    list.className = 'lesson-list';
+    var items = (state.resources||[]).filter(function(r){ return !resourceFilter || r.category===resourceFilter; });
+    if(items.length===0){
+      list.appendChild(el('<div class="card empty-state"><p>Пока ничего не добавлено. Пришли ссылки — и они появятся здесь.</p></div>'));
+    }
+    items.forEach(function(r){
+      var row = document.createElement('div');
+      row.className = 'lesson-row';
+      row.innerHTML =
+        '<span class="lesson-dot" style="background:var(--accent);"></span>'+
+        '<div class="lesson-info">'+
+          '<a href="'+r.link+'" target="_blank" rel="noopener" class="t" style="color:var(--accent); text-decoration:none;">'+escapeHtml(r.title)+'</a>'+
+          '<div class="m">'+escapeHtml(r.category)+(r.note?' · '+escapeHtml(r.note):'')+(r.durationLabel?' · '+escapeHtml(r.durationLabel):'')+'</div>'+
+        '</div>';
+      list.appendChild(row);
+    });
+    root.appendChild(list);
+
+    var addBtn = document.createElement('button');
+    addBtn.className = 'btn btn-ghost';
+    addBtn.style.marginTop = '14px';
+    addBtn.textContent = '+ Добавить ссылку';
+    addBtn.onclick = function(){ openResourceForm(null); };
+    root.appendChild(addBtn);
+  }
+
+  function openResourceForm(existing){
+    var root = document.getElementById('modalRoot');
+    var f = existing || {id:null, title:"", category:RES_CATS[0], link:"", note:""};
+    var overlay = el('<div class="overlay"></div>');
+    var sheet = el('<div class="sheet"></div>');
+    sheet.innerHTML =
+      '<button class="close-x">✕</button>'+
+      '<div class="sheet-title">'+(existing?'Изменить ссылку':'Новая ссылка')+'</div>'+
+      '<div class="field"><label>Название</label><input type="text" id="r-title" value="'+escapeHtml(f.title)+'" placeholder="Например: разбор питания после родов"></div>'+
+      '<div class="field"><label>Ссылка</label><input type="url" id="r-link" value="'+escapeHtml(f.link)+'" placeholder="https://..."></div>'+
+      '<div class="field"><label>Категория</label><select id="r-category">'+RES_CATS.map(function(c){return '<option'+(c===f.category?' selected':'')+'>'+c+'</option>';}).join('')+'</select></div>'+
+      '<div class="field"><label>Заметка (необязательно)</label><input type="text" id="r-note" value="'+escapeHtml(f.note||'')+'"></div>';
+    var saveBtn = el('<button class="btn btn-primary">Сохранить</button>');
+    saveBtn.onclick = function(){
+      var title = document.getElementById('r-title').value.trim();
+      var link = document.getElementById('r-link').value.trim();
+      if(!title || !link) return;
+      var data = {
+        id: f.id || uid(),
+        title: title,
+        link: link,
+        category: document.getElementById('r-category').value,
+        note: document.getElementById('r-note').value.trim()
+      };
+      if(existing){
+        var idx = state.resources.findIndex(function(r){return r.id===f.id;});
+        state.resources[idx] = data;
+      } else {
+        state.resources.push(data);
+      }
+      saveState();
+      closeModal();
+      render();
+    };
+    sheet.appendChild(saveBtn);
+    if(existing){
+      var delBtn = el('<button class="btn btn-ghost" style="margin-top:8px;">Удалить</button>');
+      delBtn.onclick = function(){
+        state.resources = state.resources.filter(function(r){return r.id!==f.id;});
+        saveState(); closeModal(); render();
+      };
+      sheet.appendChild(delBtn);
+    }
+    overlay.appendChild(sheet);
+    root.appendChild(overlay);
+    sheet.querySelector('.close-x').onclick = closeModal;
+    overlay.onclick = function(e){ if(e.target===overlay) closeModal(); };
+  }
+
+  function dayLabelOf(item){
+    var m = item.rawLine.match(/^День\s*(\d+)/i);
+    return m ? ('День '+m[1]) : 'Без привязки к дню';
+  }
+  function stripDayPrefix(rawLine){
+    return rawLine.replace(/^День\s*\d+\s*/i, '').replace(/^—\s*/,'').trim() || rawLine;
+  }
+  function groupItemsByDay(items){
+    var groups = [], map = {};
+    items.forEach(function(item){
+      var key = dayLabelOf(item);
+      if(!map[key]){ map[key] = {label:key, items:[]}; groups.push(map[key]); }
+      map[key].items.push(item);
+    });
+    return groups;
+  }
+
+  function renderWeekItems(container, items){
+    var groups = groupItemsByDay(items);
+    groups.forEach(function(g){
+      var allDone = g.items.length>0 && g.items.every(function(i){return i.done;});
+      var dayHeader = el('<div class="day-header">'+escapeHtml(g.label)+(allDone?' <span class="day-check">✓</span>':'')+'</div>');
+      container.appendChild(dayHeader);
+      g.items.forEach(function(item){
+        var lesson = item.catalogId ? catalogById(item.catalogId) : null;
+        var isSpecial = item.type==='rest' || item.type==='note';
+        var row = document.createElement('div');
+        row.className = 'plan-item' + (item.done?' done':'') + (!lesson && !isSpecial?' unmatched':'');
+        var numHtml = item.done ? '✓' : '·';
+        var title = item.type==='rest' ? 'Выходной' : (lesson ? lesson.title : stripDayPrefix(item.rawLine));
+        var subLine;
+        var hwTag = item.type==='homework' ? ' · домашнее задание' : '';
+        var eveningTag = isEvening(item) ? ' · вечером' : '';
+        if(item.type==='rest'){ subLine = '<div class="r">без занятия</div>'; }
+        else if(item.type==='note'){ subLine = '<div class="r">без видео — офлайн-активность</div>'; }
+        else if(lesson){ subLine = '<div class="r">'+escapeHtml(lesson.zone)+(function(){ var m = roundedDurationMinutes(lesson); return m>0 ? ' · '+m+' мин' : ''; })()+escapeHtml(hwTag)+escapeHtml(eveningTag)+'</div>'; }
+        else { subLine = '<div class="r">строка: «'+escapeHtml(stripDayPrefix(item.rawLine))+'» — не сопоставлено</div>'; }
+        row.innerHTML =
+          '<div class="plan-num">'+numHtml+'</div>'+
+          '<div class="plan-text">'+
+            '<div class="t">'+escapeHtml(title)+'</div>'+
+            subLine+
+          '</div>';
+        if(!lesson && !isSpecial){
+          var sel = document.createElement('select');
+          sel.className = 'match-select';
+          sel.innerHTML = '<option value="">— выбрать занятие —</option>' +
+            state.catalog.map(function(c){ return '<option value="'+c.id+'">'+escapeHtml(c.title)+'</option>'; }).join('');
+          sel.onchange = function(){
+            item.catalogId = sel.value || null;
+            saveState(); render();
+          };
+          var wrap = row.querySelector('.plan-text');
+          wrap.appendChild(sel);
+        }
+        container.appendChild(row);
+      });
+    });
+  }
+
+  function renderWeek(){
+    var root = document.getElementById('view-week');
+    root.innerHTML = "";
+
+    var pasteCard = document.createElement('div');
+    pasteCard.className = 'card';
+    pasteCard.innerHTML =
+      '<h3 style="font-size:16px;margin-bottom:10px;">Новая последовательность от Веры</h3>'+
+      '<div class="field"><textarea id="planTextInput" placeholder="Вставьте сюда сообщение Веры, например:\nдень 1 - «дыхание и мягкое ядро»\nдень 2 - «пресс»..."></textarea></div>';
+    var parseBtn = el('<button class="btn btn-primary">Разобрать и добавить как новую неделю</button>');
+    parseBtn.onclick = function(){
+      var text = document.getElementById('planTextInput').value;
+      if(!text.trim()) return;
+      var items = parsePlanText(text);
+      var newWeek = {
+        id: uid(),
+        label: (state.weeks.length+1)+' неделя',
+        rawText: text,
+        items: items
+      };
+      ensureHomework(newWeek);
+      state.weeks.push(newWeek);
+      saveState();
+      render();
+    };
+    pasteCard.appendChild(parseBtn);
+    root.appendChild(pasteCard);
+
+    if(!state.weeks.length){
+      root.appendChild(el('<div class="card empty-state"><p>Пока ни одной недели не сохранено.</p></div>'));
+      return;
+    }
+
+    for(var w=state.weeks.length-1; w>=0; w--){
+      var week = state.weeks[w];
+      var isCurrent = (w===state.weeks.length-1);
+      var details = document.createElement('details');
+      details.className = 'week-block';
+      if(isCurrent) details.open = true;
+      var summary = el('<summary>'+escapeHtml(week.label)+(isCurrent?' <span class="chip accent" style="margin-left:6px;">текущая</span>':'')+'</summary>');
+      details.appendChild(summary);
+      var listCard = document.createElement('div');
+      listCard.className = 'card';
+      listCard.style.marginTop = '10px';
+      renderWeekItems(listCard, week.items||[]);
+      details.appendChild(listCard);
+      root.appendChild(details);
+    }
+  }
+
+  function allItems(){
+    var out = [];
+    (state.weeks||[]).forEach(function(w){ (w.items||[]).forEach(function(i){ out.push(i); }); });
+    return out;
+  }
+
+  function renderProgress(){
+    var root = document.getElementById('view-progress');
+    root.innerHTML = "";
+    var items = allItems();
+    var total = items.length;
+    var done = items.filter(function(i){return i.done;}).length;
+    var pct = total? Math.round(done/total*100) : 0;
+
+    var ringCard = document.createElement('div');
+    ringCard.className = 'card';
+    var r = 30, c = 2*Math.PI*r;
+    var dash = c * pct/100;
+    ringCard.innerHTML =
+      '<div class="ring-wrap">'+
+        '<svg width="76" height="76" viewBox="0 0 76 76">'+
+          '<circle cx="38" cy="38" r="'+r+'" fill="none" stroke="var(--surface-2)" stroke-width="8"/>'+
+          '<circle cx="38" cy="38" r="'+r+'" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round" '+
+            'stroke-dasharray="'+dash.toFixed(1)+' '+c.toFixed(1)+'" transform="rotate(-90 38 38)"/>'+
+        '</svg>'+
+        '<div><div class="ring-num">'+pct+'%</div><div style="font-size:12.5px;color:var(--ink-soft);">недели пройдено</div></div>'+
+      '</div>'+
+      '<div class="stat-row">'+
+        '<div class="stat-box"><div class="n">'+done+'</div><div class="l">сделано</div></div>'+
+        '<div class="stat-box"><div class="n">'+(total-done)+'</div><div class="l">осталось</div></div>'+
+        '<div class="stat-box"><div class="n">'+streakDays()+'</div><div class="l">дней подряд</div></div>'+
+      '</div>';
+    root.appendChild(ringCard);
+
+    root.appendChild(el('<div class="section-title">По зонам тела (все недели)</div>'));
+    var zoneCard = document.createElement('div');
+    zoneCard.className = 'card';
+    var counts = {};
+    ZONES.forEach(function(z){ counts[z]=0; });
+    items.forEach(function(i){
+      if(i.done && i.catalogId){
+        var l = catalogById(i.catalogId);
+        if(l) counts[l.zone] = (counts[l.zone]||0)+1;
+      }
+    });
+    var maxC = Math.max(1, Math.max.apply(null, Object.keys(counts).map(function(k){return counts[k];})));
+    ZONES.forEach(function(z){
+      var n = counts[z];
+      var row = document.createElement('div');
+      row.className = 'zone-bar-row';
+      row.innerHTML =
+        '<div class="zone-bar-label">'+escapeHtml(z)+'</div>'+
+        '<div class="zone-bar-track"><div class="zone-bar-fill" style="width:'+(n/maxC*100)+'%"></div></div>'+
+        '<div class="zone-bar-n">'+n+'</div>';
+      zoneCard.appendChild(row);
+    });
+    root.appendChild(zoneCard);
+  }
+
+  function streakDays(){
+    var dates = {};
+    allItems().forEach(function(i){ if(i.done && i.completedAt) dates[i.completedAt]=true; });
+    (state.feedbackLog||[]).forEach(function(f){ if(f.date) dates[f.date]=true; });
+    var n=0, d=new Date();
+    while(true){
+      var key = d.toISOString().slice(0,10);
+      if(dates[key]){ n++; d.setDate(d.getDate()-1); } else break;
+    }
+    return n;
+  }
+
+  // ---------- lesson add/edit modal ----------
+  function openLessonForm(existing){
+    var root = document.getElementById('modalRoot');
+    var f = existing || {id:null, code:"", title:"", zone:ZONES[0], duration:15, tags:"", link:"", example:false};
+    var overlay = el('<div class="overlay"></div>');
+    var sheet = el('<div class="sheet"></div>');
+    sheet.innerHTML =
+      '<button class="close-x">✕</button>'+
+      '<div class="sheet-title">'+(existing?'Изменить занятие':'Новое занятие')+'</div>'+
+      '<div class="field"><label>Название</label><input type="text" id="f-title" value="'+escapeHtml(f.title)+'"></div>'+
+      '<div class="field"><label>Ссылка на пост в Telegram</label><input type="url" id="f-link" value="'+escapeHtml(f.link)+'" placeholder="https://t.me/c/..."></div>'+
+      '<div class="field"><label>Номер/код у Веры (необязательно)</label><input type="text" id="f-code" value="'+escapeHtml(f.code||'')+'"></div>'+
+      '<div class="field"><label>Зона</label><select id="f-zone">'+ZONES.map(function(z){return '<option'+(z===f.zone?' selected':'')+'>'+z+'</option>';}).join('')+'</select></div>'+
+      '<div class="field"><label>Длительность, мин</label><input type="number" id="f-duration" value="'+f.duration+'"></div>'+
+      '<div class="field"><label>Инвентарь / теги</label><input type="text" id="f-tags" value="'+escapeHtml(f.tags||'')+'"></div>';
+    var saveBtn = el('<button class="btn btn-primary">Сохранить</button>');
+    saveBtn.onclick = function(){
+      var title = document.getElementById('f-title').value.trim();
+      if(!title) return;
+      var data = {
+        id: f.id || uid(),
+        title: title,
+        link: document.getElementById('f-link').value.trim() || '#',
+        code: document.getElementById('f-code').value.trim(),
+        zone: document.getElementById('f-zone').value,
+        duration: parseInt(document.getElementById('f-duration').value,10) || 0,
+        tags: document.getElementById('f-tags').value.trim(),
+        example: f.example||false
+      };
+      if(existing){
+        var idx = state.catalog.findIndex(function(c){return c.id===f.id;});
+        state.catalog[idx] = data;
+      } else {
+        state.catalog.push(data);
+      }
+      saveState();
+      closeModal();
+      render();
+    };
+    sheet.appendChild(saveBtn);
+    if(existing){
+      var delBtn = el('<button class="btn btn-ghost" style="margin-top:8px;">Удалить занятие</button>');
+      delBtn.onclick = function(){
+        state.catalog = state.catalog.filter(function(c){return c.id!==f.id;});
+        saveState(); closeModal(); render();
+      };
+      sheet.appendChild(delBtn);
+    }
+    overlay.appendChild(sheet);
+    root.appendChild(overlay);
+    sheet.querySelector('.close-x').onclick = closeModal;
+    overlay.onclick = function(e){ if(e.target===overlay) closeModal(); };
+  }
+
+  function closeModal(){ document.getElementById('modalRoot').innerHTML=""; }
+
+  // ---------- feedback modal ----------
+  function openFeedbackModal(planItem, lesson){
+    var root = document.getElementById('modalRoot');
+    var overlay = el('<div class="overlay"></div>');
+    var sheet = el('<div class="sheet"></div>');
+    var fb = {how:'нормально', extent:'целиком', feelings:[], changes:[], comment:''};
+
+    sheet.innerHTML =
+      '<button class="close-x">✕</button>'+
+      '<div class="sheet-title">Как прошло?</div>'+
+      '<div class="field"><label>Ощущения (можно несколько)</label><div class="chipset" id="fb-feel">'+
+        FEEL_OPTS.map(function(o){return '<button type="button" class="chip-toggle" data-v="'+o+'">'+o+'</button>';}).join('')+
+      '</div></div>'+
+      '<div class="field"><label>Комментарий</label><textarea id="fb-comment" placeholder="Необязательно"></textarea></div>';
+
+    function wireChips(containerId, arrKey, single){
+      var cont = sheet.querySelector('#'+containerId);
+      cont.querySelectorAll('.chip-toggle').forEach(function(btn){
+        btn.onclick = function(){
+          var v = btn.dataset.v;
+          if(single){
+            fb[arrKey] = v;
+            cont.querySelectorAll('.chip-toggle').forEach(function(b){b.classList.toggle('on', b===btn);});
+          } else {
+            var i = fb[arrKey].indexOf(v);
+            if(i===-1){ fb[arrKey].push(v); btn.classList.add('on'); }
+            else { fb[arrKey].splice(i,1); btn.classList.remove('on'); }
+          }
+        };
+      });
+    }
+    wireChips('fb-feel','feelings',false);
+
+    var warnBox = el('<p class="note hidden" id="fb-warn" style="color:var(--amber);">Если что-то тревожит — обсуди это с Верой или врачом.</p>');
+    sheet.appendChild(warnBox);
+    var concerning = ["Боль в пояснице","Боль в спине","Дискомфорт в тазовом дне","Головокружение"];
+
+    var submitBtn = el('<button class="btn btn-primary">Готово</button>');
+    submitBtn.onclick = function(){
+      fb.comment = sheet.querySelector('#fb-comment').value.trim();
+      var hasConcern = fb.feelings.some(function(f){ return concerning.indexOf(f)!==-1; });
+      var today = todayStr();
+      planItem.done = true;
+      planItem.completedAt = today;
+      planItem.feedback = fb;
+      state.feedbackLog.push({date:today, lessonTitle: lesson?lesson.title:planItem.rawLine, feedback:fb});
+      saveState();
+      showFeedbackSummary(lesson, fb, hasConcern);
+    };
+    sheet.appendChild(submitBtn);
+
+    overlay.appendChild(sheet);
+    root.appendChild(overlay);
+    sheet.querySelector('.close-x').onclick = closeModal;
+    overlay.onclick = function(e){ if(e.target===overlay) closeModal(); };
+  }
+
+  function showFeedbackSummary(lesson, fb, hasConcern){
+    var root = document.getElementById('modalRoot');
+    root.innerHTML = "";
+    var overlay = el('<div class="overlay"></div>');
+    var sheet = el('<div class="sheet"></div>');
+    var text =
+      'Занятие: ' + (lesson?lesson.title:'—') + '\n' +
+      (fb.feelings.length? 'Ощущения: ' + fb.feelings.join(', ') + '\n' : '') +
+      (fb.comment? 'Комментарий: ' + fb.comment + '\n' : '') +
+      'Дата: ' + todayStr();
+
+    sheet.innerHTML =
+      '<button class="close-x">✕</button>'+
+      '<div class="sheet-title">Готово ✓</div>'+
+      (hasConcern? '<p class="note" style="color:var(--amber);margin-bottom:12px;">Отмечено что-то из тревожного списка — обсуди это с Верой или врачом.</p>' : '')+
+      '<p class="note" style="margin-bottom:10px;">Пока отправка Вере напрямую не подключена — скопируйте текст и отправьте его в Telegram вручную.</p>'+
+      '<textarea class="copy-box" readonly id="copyText"></textarea>';
+    sheet.querySelector('#copyText').value = text;
+    var copyBtn = el('<button class="btn btn-secondary" style="margin-top:12px;">Скопировать текст</button>');
+    copyBtn.onclick = function(){
+      var ta = sheet.querySelector('#copyText');
+      ta.select();
+      try{ navigator.clipboard.writeText(text); copyBtn.textContent='Скопировано ✓'; }
+      catch(e){ try{ document.execCommand('copy'); copyBtn.textContent='Скопировано ✓'; }catch(e2){} }
+      setTimeout(function(){ copyBtn.textContent='Скопировать текст'; }, 1800);
+    };
+    sheet.appendChild(copyBtn);
+    var okBtn = el('<button class="btn btn-primary" style="margin-top:8px;">Готово</button>');
+    okBtn.onclick = function(){ closeModal(); render(); };
+    sheet.appendChild(okBtn);
+    overlay.appendChild(sheet);
+    root.appendChild(overlay);
+    sheet.querySelector('.close-x').onclick = function(){ closeModal(); render(); };
+    overlay.onclick = function(e){ if(e.target===overlay){ closeModal(); render(); } };
+  }
+
+  // ---------- settings ----------
+  function openSettings(){
+    var root = document.getElementById('modalRoot');
+    var overlay = el('<div class="overlay"></div>');
+    var sheet = el('<div class="sheet"></div>');
+    sheet.innerHTML =
+      '<button class="close-x">✕</button>'+
+      '<div class="sheet-title">Настройки</div>'+
+      '<p class="note" style="margin-bottom:16px;">Данные хранятся только в этом браузере на этом телефоне. Это MVP-прототип: каталог занятий и план недели можно редактировать на вкладках «Каталог» и «Неделя».</p>';
+    var resetBtn = el('<button class="btn btn-ghost">Сбросить все данные (пример заново)</button>');
+    resetBtn.onclick = function(){
+      state = seedState();
+      saveState();
+      closeModal();
+      render();
+    };
+    sheet.appendChild(resetBtn);
+    overlay.appendChild(sheet);
+    root.appendChild(overlay);
+    sheet.querySelector('.close-x').onclick = closeModal;
+    overlay.onclick = function(e){ if(e.target===overlay) closeModal(); };
+  }
+
+  document.getElementById('settingsBtn').onclick = openSettings;
+  document.querySelectorAll('.nav-btn').forEach(function(b){
+    b.onclick = function(){ activeTab = b.dataset.tab; render(); };
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
