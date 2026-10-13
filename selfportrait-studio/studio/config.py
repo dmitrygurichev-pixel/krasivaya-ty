@@ -16,7 +16,7 @@ DEFAULTS: dict = {
         "gphoto2": {"binary": "gphoto2", "keep_on_camera": True},
     },
     "paths": {"work_dir": "./data"},
-    "processing": {"quality": 92, "steps": []},
+    "processing": {"quality": 92, "variants": [{"name": "", "steps": []}]},
     "yandex_disk": {
         "token_env": "YADISK_TOKEN",
         "token_file": None,
@@ -55,9 +55,10 @@ def load(path: str | os.PathLike) -> dict:
     tf = cfg["yandex_disk"].get("token_file")
     if tf and not Path(tf).is_absolute():
         cfg["yandex_disk"]["token_file"] = str((base / tf).resolve())
-    for step in cfg["processing"]["steps"]:
-        if step.get("path") and not Path(step["path"]).is_absolute():
-            step["path"] = str((base / step["path"]).resolve())
+    for variant in cfg["processing"]["variants"]:
+        for step in variant.get("steps", []):
+            if step.get("path") and not Path(step["path"]).is_absolute():
+                step["path"] = str((base / step["path"]).resolve())
     return cfg
 
 

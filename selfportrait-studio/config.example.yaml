@@ -1,10 +1,10 @@
 # Скопируйте в config.yaml и поправьте. Относительные пути считаются от папки с этим файлом.
 
 camera:
-  mode: folder          # folder  — следить за папкой, куда камера/программа съёмки кладёт файлы
+  mode: folder          # для Canon 90D на Windows — folder. folder  — следить за папкой, куда камера/программа съёмки кладёт файлы
                         #           (digiCamControl, Canon EOS Utility, Sony Imaging Edge, Wi-Fi/FTP камеры)
                         # gphoto2 — программа сама держит связь с камерой по USB (Linux/macOS, нужен gphoto2)
-  inbox: ./inbox
+  inbox: C:/Studio/inbox   # сюда Canon EOS Utility / digiCamControl сохраняет снимки (в Windows пишите / вместо \\)
   extensions: [jpg, jpeg, png, tif, tiff]
   stable_seconds: 3     # ждать, пока файл перестанет изменяться
   gphoto2:
@@ -14,20 +14,33 @@ camera:
 paths:
   work_dir: ./data      # база очереди, логи, processed/, archive/, failed/
 
-# Алгоритм обработки: шаги выполняются сверху вниз. Меняйте/добавляйте/удаляйте под свой стиль.
+# Алгоритм обработки. Из каждого снимка получается по одному файлу на каждый вариант (variants).
+# Шаги внутри варианта идут сверху вниз. Параметры подобраны по вашим эталонам «до/после»
+# (цветной: тёплый, светлее, ярче и резче; ч/б: контрастный, светлая кожа).
 processing:
-  quality: 92
-  steps:
-    - {op: crop_ratio, ratio: "4:5"}
-    - {op: autocontrast, cutoff: 1}
-    - {op: brightness, factor: 1.05}
-    - {op: contrast, factor: 1.08}
-    - {op: color, factor: 1.05}
-    - {op: resize, max_side: 2400}
-    - {op: sharpness, factor: 1.3}
-    # - {op: grayscale}
-    # - {op: border, size: 40, color: white}
-    # - {op: watermark, path: ./logo.png, position: bottom-right, scale: 0.18, opacity: 0.9}
+  quality: 95
+  variants:
+    - name: color                      # файл получит суффикс _color
+      steps:
+        - op: curve                    # тоновая кривая по каналам: тени и середина светлее, красный сильнее (тепло)
+          r: [[0, 0], [32, 49], [64, 111], [96, 146], [128, 178], [192, 228], [255, 255]]
+          g: [[0, 0], [32, 50], [64, 102], [96, 138], [128, 172], [192, 225], [255, 255]]
+          b: [[0, 0], [32, 46], [64, 92],  [96, 132], [128, 168], [192, 225], [255, 255]]
+        - {op: warm_boost, gamma: 1.3}                 # волосы и кожа ярче и теплее, белое/джинса не трогаем
+        - {op: unsharp, radius: 8, percent: 30}        # локальный контраст («clarity»)
+        - {op: unsharp, radius: 1.2, percent: 60}      # резкость
+    - name: bw                         # файл получит суффикс _bw
+      steps:
+        - {op: warm_boost, gamma: 1.3}
+        - {op: gray_mix, weights: [0.5, 0.4, 0.1]}    # больше красного — светлее кожа
+        - op: curve
+          points: [[0, 0], [32, 17], [64, 62], [96, 98], [128, 141], [192, 204], [255, 255]]
+        - {op: unsharp, radius: 8, percent: 30}
+        - {op: unsharp, radius: 1.2, percent: 60}
+  # Доступные шаги: curve, gray_mix, unsharp, autocontrast, brightness, contrast, color, sharpness,
+  # warm_boost, grayscale, crop_ratio, resize, border, watermark. Пример логотипа и обрезки в начало варианта:
+  #   - {op: crop_ratio, ratio: "4:5"}
+  #   - {op: watermark, path: ./logo.png, position: bottom-right, scale: 0.18, opacity: 0.9}
 
 yandex_disk:
   token_env: YADISK_TOKEN      # OAuth-токен берётся из этой переменной окружения...

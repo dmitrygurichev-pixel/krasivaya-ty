@@ -57,7 +57,9 @@ class App:
         for d in (self.inbox, work, self.processed_dir, self.archive_dir, self.failed_dir):
             d.mkdir(parents=True, exist_ok=True)
         self.db = JobDB(str(work / "jobs.sqlite"))
-        processing.validate_steps(cfg["processing"]["steps"])
+        self.variants = {v.get("name", ""): v.get("steps", []) for v in cfg["processing"]["variants"]}
+        for steps in self.variants.values():
+            processing.validate_steps(steps)
         yd = cfg["yandex_disk"]
         self.disk = disk or YandexDisk(get_token(cfg), yd["timeout"])
         self.remote_root = "/" + yd["remote_root"].strip("/")
@@ -75,8 +77,9 @@ class App:
             st = p.stat()
             if st.st_size == 0 or now - st.st_mtime < stable:
                 continue  # файл ещё записывается
-            key = f"{p.resolve()}|{st.st_size}|{st.st_mtime_ns}"
-            if self.db.add(key, str(p)):
+            base_key = f"{p.resolve()}|{st.st_size}|{st.st_mtime_ns}"
+            added = [self.db.add(f"{base_key}|{name}", str(p), name) for name in self.variants]
+            if any(added):
                 log.info("новый снимок: %s", p.name)
 
     # --- 2. обработка -----------------------------------------------------------------
@@ -84,17 +87,17 @@ class App:
         for job in self.db.due("new"):
             src = Path(job["src"])
             ts = datetime.fromtimestamp(src.stat().st_mtime) if src.exists() else datetime.now()
-            out = self.processed_dir / f"{job['id']:06d}_{src.stem}.jpg"
-            remote = f"{self.remote_root}/{ts:%Y-%m-%d}/{ts:%Y%m%d_%H%M%S}_{src.stem}.jpg"
+            suffix = f"_{job['variant']}" if job["variant"] else ""
+            out = self.processed_dir / f"{job['id']:06d}_{src.stem}{suffix}.jpg"
+            remote = f"{self.remote_root}/{ts:%Y-%m-%d}/{ts:%Y%m%d_%H%M%S}_{src.stem}{suffix}.jpg"
             try:
-                processing.process(src, out, self.cfg["processing"]["steps"], self.cfg["processing"]["quality"])
+                processing.process(src, out, self.variants[job["variant"]], self.cfg["processing"]["quality"])
             except Exception as e:  # битый/недописанный файл
                 n = job["attempts"] + 1
                 if n >= self.rt["max_process_attempts"]:
-                    log.error("снимок %s не обработан, переносим в failed: %s", src.name, e)
-                    if src.exists():
-                        shutil.move(src, self.failed_dir / f"{job['id']:06d}_{src.name}")
+                    log.error("снимок %s (%s) не обработан: %s", src.name, job["variant"] or "основной", e)
                     self.db.update(job["id"], status="failed", attempts=n, error=str(e))
+                    self._finish_src(src)
                 else:
                     log.warning("ошибка обработки %s (попытка %d): %s", src.name, n, e)
                     self.db.update(job["id"], attempts=n, error=str(e), next_try=time.time() + 5 * n)
@@ -123,14 +126,21 @@ class App:
             self._cleanup(job)
 
     def _cleanup(self, job) -> None:
-        src, proc = Path(job["src"]), Path(job["processed_path"])
-        if src.exists():
-            if self.rt["keep_originals"]:
-                shutil.move(src, self.archive_dir / f"{job['id']:06d}_{src.name}")
-            else:
-                src.unlink()
         if not self.rt["keep_processed"]:
-            proc.unlink(missing_ok=True)
+            Path(job["processed_path"]).unlink(missing_ok=True)
+        self._finish_src(Path(job["src"]))
+
+    def _finish_src(self, src: Path) -> None:
+        """Оригинал убираем только когда все его варианты дошли до конца (выгружены или провалены)."""
+        states = self.db.src_statuses(str(src))
+        if not src.exists() or any(st in ("new", "processed") for st in states):
+            return
+        if "failed" in states:
+            shutil.move(src, self.failed_dir / f"{int(time.time())}_{src.name}")
+        elif self.rt["keep_originals"]:
+            shutil.move(src, self.archive_dir / f"{int(time.time())}_{src.name}")
+        else:
+            src.unlink()
 
     # --- цикл -------------------------------------------------------------------------
     def run_once(self) -> None:

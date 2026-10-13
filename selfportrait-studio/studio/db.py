@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS jobs (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   key TEXT UNIQUE NOT NULL,
   src TEXT NOT NULL,
+  variant TEXT NOT NULL DEFAULT '',
   status TEXT NOT NULL DEFAULT 'new',      -- new | processed | uploaded | failed
   processed_path TEXT,
   remote_path TEXT,
@@ -26,10 +27,15 @@ class JobDB:
         self.c = sqlite3.connect(path)
         self.c.row_factory = sqlite3.Row
         self.c.executescript(SCHEMA)
+        try:  # база от старой версии без вариантов
+            self.c.execute("ALTER TABLE jobs ADD COLUMN variant TEXT NOT NULL DEFAULT ''")
+        except sqlite3.OperationalError:
+            pass
 
-    def add(self, key: str, src: str) -> bool:
+    def add(self, key: str, src: str, variant: str = "") -> bool:
         cur = self.c.execute(
-            "INSERT OR IGNORE INTO jobs(key, src, created) VALUES (?,?,?)", (key, src, time.time())
+            "INSERT OR IGNORE INTO jobs(key, src, variant, created) VALUES (?,?,?,?)",
+            (key, src, variant, time.time()),
         )
         self.c.commit()
         return cur.rowcount == 1
@@ -43,6 +49,9 @@ class JobDB:
         cols = ", ".join(f"{k}=?" for k in fields)
         self.c.execute(f"UPDATE jobs SET {cols} WHERE id=?", (*fields.values(), job_id))
         self.c.commit()
+
+    def src_statuses(self, src: str) -> list[str]:
+        return [r[0] for r in self.c.execute("SELECT status FROM jobs WHERE src=?", (src,))]
 
     def counts(self) -> dict[str, int]:
         return {r[0]: r[1] for r in self.c.execute("SELECT status, COUNT(*) FROM jobs GROUP BY status")}

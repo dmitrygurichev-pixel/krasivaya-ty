@@ -29,7 +29,7 @@ def make_cfg(tmp_path, steps=None):
     (tmp_path / "config.yaml").write_text(
         f"camera: {{inbox: ./inbox, stable_seconds: 0}}\n"
         f"runtime: {{keep_originals: true}}\n"
-        f"processing: {{steps: {steps or []}}}\n", encoding="utf-8")
+        f"processing: {{variants: [{{name: '', steps: {steps or []}}}]}}\n", encoding="utf-8")
     return config.load(tmp_path / "config.yaml")
 
 
@@ -103,3 +103,38 @@ def test_watermark_and_unknown_step(tmp_path):
     assert px[0] > 200 and px[1] < 80                # красный логотип в правом нижнем углу
     with pytest.raises(ValueError):
         processing.validate_steps([{"op": "nope"}])
+
+
+def test_two_variants_and_original_archived_once(tmp_path):
+    (tmp_path / "config.yaml").write_text(
+        "camera: {stable_seconds: 0}\n"
+        "processing:\n  variants:\n"
+        "    - {name: color, steps: [{op: curve, r: [[0,0],[128,200],[255,255]]}]}\n"
+        "    - {name: bw, steps: [{op: gray_mix, weights: [0.5,0.4,0.1]}]}\n", encoding="utf-8")
+    disk = FakeDisk()
+    app = App(config.load(tmp_path / "config.yaml"), disk)
+    shot(tmp_path / "inbox")
+    app.run_once()
+    names = sorted(k.rsplit("_", 1)[1] for k in disk.files)
+    assert names == ["bw.jpg", "color.jpg"]
+    assert len(list((tmp_path / "data" / "archive").iterdir())) == 1
+    assert not list((tmp_path / "inbox").iterdir())
+    bw = tmp_path / "bw.jpg"
+    bw.write_bytes(next(v for k, v in disk.files.items() if k.endswith("_bw.jpg")))
+    r, g, b = Image.open(bw).getpixel((5, 5))
+    assert abs(r - g) < 3 and abs(g - b) < 3          # действительно чёрно-белый
+
+
+def test_curve_brightens_and_is_monotone():
+    lut = processing.monotone_lut([[0, 0], [64, 111], [128, 178], [255, 255]])
+    assert lut[64] == 111 and lut[0] == 0 and lut[255] == 255
+    assert all(a <= b for a, b in zip(lut, lut[1:]))
+
+
+def test_warm_boost_lifts_warm_but_not_neutral(tmp_path):
+    warm = Image.new("RGB", (8, 8), (160, 110, 90))
+    grey = Image.new("RGB", (8, 8), (120, 120, 120))
+    w = processing.STEPS["warm_boost"](warm, gamma=1.3)
+    g = processing.STEPS["warm_boost"](grey, gamma=1.3)
+    assert sum(w.getpixel((0, 0))) > sum(warm.getpixel((0, 0))) + 15
+    assert g.getpixel((0, 0)) == grey.getpixel((0, 0))
