@@ -150,9 +150,16 @@ class App:
         self.process_all()
         self.upload_all()
 
-    def run_forever(self) -> None:
-        for sig in (signal.SIGINT, signal.SIGTERM):
-            signal.signal(sig, lambda *_: setattr(self, "_stop", True))
+    def db_counts(self) -> dict:
+        return self.db.counts()
+
+    def stop(self) -> None:
+        self._stop = True
+
+    def run_forever(self, handle_signals: bool = True) -> None:
+        if handle_signals:  # из окна (не главный поток) сигналы ставить нельзя
+            for sig in (signal.SIGINT, signal.SIGTERM):
+                signal.signal(sig, lambda *_: self.stop())
         log.info("запущено; очередь: %s", self.db.counts())
         last_report = time.time()
         while not self._stop:

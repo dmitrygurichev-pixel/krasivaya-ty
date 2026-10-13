@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import sqlite3
+import threading
 import time
 
 SCHEMA = """
@@ -24,7 +25,9 @@ CREATE TABLE IF NOT EXISTS jobs (
 
 class JobDB:
     def __init__(self, path: str):
-        self.c = sqlite3.connect(path)
+        # окно читает счётчики из другого потока, поэтому соединение общее, доступ под замком
+        self.c = sqlite3.connect(path, check_same_thread=False)
+        self.lock = threading.RLock()
         self.c.row_factory = sqlite3.Row
         self.c.executescript(SCHEMA)
         try:  # база от старой версии без вариантов
@@ -33,25 +36,30 @@ class JobDB:
             pass
 
     def add(self, key: str, src: str, variant: str = "") -> bool:
-        cur = self.c.execute(
-            "INSERT OR IGNORE INTO jobs(key, src, variant, created) VALUES (?,?,?,?)",
-            (key, src, variant, time.time()),
-        )
-        self.c.commit()
-        return cur.rowcount == 1
+        with self.lock:
+            cur = self.c.execute(
+                "INSERT OR IGNORE INTO jobs(key, src, variant, created) VALUES (?,?,?,?)",
+                (key, src, variant, time.time()),
+            )
+            self.c.commit()
+            return cur.rowcount == 1
 
     def due(self, status: str) -> list[sqlite3.Row]:
-        return self.c.execute(
-            "SELECT * FROM jobs WHERE status=? AND next_try<=? ORDER BY id", (status, time.time())
-        ).fetchall()
+        with self.lock:
+            return self.c.execute(
+                "SELECT * FROM jobs WHERE status=? AND next_try<=? ORDER BY id", (status, time.time())
+            ).fetchall()
 
     def update(self, job_id: int, **fields) -> None:
         cols = ", ".join(f"{k}=?" for k in fields)
-        self.c.execute(f"UPDATE jobs SET {cols} WHERE id=?", (*fields.values(), job_id))
-        self.c.commit()
+        with self.lock:
+            self.c.execute(f"UPDATE jobs SET {cols} WHERE id=?", (*fields.values(), job_id))
+            self.c.commit()
 
     def src_statuses(self, src: str) -> list[str]:
-        return [r[0] for r in self.c.execute("SELECT status FROM jobs WHERE src=?", (src,))]
+        with self.lock:
+            return [r[0] for r in self.c.execute("SELECT status FROM jobs WHERE src=?", (src,))]
 
     def counts(self) -> dict[str, int]:
-        return {r[0]: r[1] for r in self.c.execute("SELECT status, COUNT(*) FROM jobs GROUP BY status")}
+        with self.lock:
+            return {r[0]: r[1] for r in self.c.execute("SELECT status, COUNT(*) FROM jobs GROUP BY status")}

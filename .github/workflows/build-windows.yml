@@ -1,0 +1,30 @@
+name: Build Windows app
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "selfportrait-studio/**"
+      - ".github/workflows/build-windows.yml"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: selfportrait-studio
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt pyinstaller
+      - run: python -m pytest -q
+      - name: Build exe
+        run: >
+          pyinstaller --noconfirm --onefile --windowed --name SelfPortraitStudio
+          --add-data "config.example.yaml;." run_gui.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SelfPortraitStudio-windows
+          path: selfportrait-studio/dist/SelfPortraitStudio.exe
