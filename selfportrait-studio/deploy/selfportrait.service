@@ -1,0 +1,17 @@
+# Linux: sudo cp deploy/selfportrait.service /etc/systemd/system/ && sudo systemctl enable --now selfportrait
+# Поправьте User и пути. Токен лежит в /etc/selfportrait.env строкой YADISK_TOKEN=...
+[Unit]
+Description=Студия автопортрета: камера -> обработка -> Яндекс Диск
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=studio
+WorkingDirectory=/opt/selfportrait-studio
+EnvironmentFile=/etc/selfportrait.env
+ExecStart=/opt/selfportrait-studio/.venv/bin/python -m studio -c /opt/selfportrait-studio/config.yaml
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

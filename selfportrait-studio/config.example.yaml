@@ -1,0 +1,43 @@
+# Скопируйте в config.yaml и поправьте. Относительные пути считаются от папки с этим файлом.
+
+camera:
+  mode: folder          # folder  — следить за папкой, куда камера/программа съёмки кладёт файлы
+                        #           (digiCamControl, Canon EOS Utility, Sony Imaging Edge, Wi-Fi/FTP камеры)
+                        # gphoto2 — программа сама держит связь с камерой по USB (Linux/macOS, нужен gphoto2)
+  inbox: ./inbox
+  extensions: [jpg, jpeg, png, tif, tiff]
+  stable_seconds: 3     # ждать, пока файл перестанет изменяться
+  gphoto2:
+    binary: gphoto2
+    keep_on_camera: true
+
+paths:
+  work_dir: ./data      # база очереди, логи, processed/, archive/, failed/
+
+# Алгоритм обработки: шаги выполняются сверху вниз. Меняйте/добавляйте/удаляйте под свой стиль.
+processing:
+  quality: 92
+  steps:
+    - {op: crop_ratio, ratio: "4:5"}
+    - {op: autocontrast, cutoff: 1}
+    - {op: brightness, factor: 1.05}
+    - {op: contrast, factor: 1.08}
+    - {op: color, factor: 1.05}
+    - {op: resize, max_side: 2400}
+    - {op: sharpness, factor: 1.3}
+    # - {op: grayscale}
+    # - {op: border, size: 40, color: white}
+    # - {op: watermark, path: ./logo.png, position: bottom-right, scale: 0.18, opacity: 0.9}
+
+yandex_disk:
+  token_env: YADISK_TOKEN      # OAuth-токен берётся из этой переменной окружения...
+  token_file: null             # ...или из файла (например ./token.txt)
+  remote_root: /Автопортрет    # итог: /Автопортрет/2026-10-13/20261013_142501_IMG_0042.jpg
+  publish: false               # true — создавать публичную ссылку на каждое фото (пишется в лог и БД)
+  timeout: 60
+
+runtime:
+  poll_interval: 2
+  keep_originals: true         # оригиналы после выгрузки уходят в data/archive
+  keep_processed: false
+  max_process_attempts: 3
